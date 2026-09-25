@@ -191,7 +191,7 @@ const theme = createTheme({
     },
 
     body1: {
-      fontSize: '0.9375rem',
+      fontSize: '1rem',
       lineHeight: 1.5,
     },
 
@@ -218,7 +218,7 @@ const theme = createTheme({
       styleOverrides: {
         body: {
           margin: 0,
-          minHeight: '100vh',
+          minHeight: '100dvh',
         },
 
         '*': {
@@ -254,10 +254,10 @@ const theme = createTheme({
         },
 
         outlined: {
-          borderColor: '#dadce0',
+          borderColor: 'divider',
 
           '&:hover': {
-            borderColor: '#1a73e8',
+            borderColor: 'primary.main',
           },
         },
 
@@ -360,15 +360,15 @@ const theme = createTheme({
           borderRadius: 8,
 
           '& .MuiOutlinedInput-notchedOutline': {
-            borderColor: '#dadce0',
+            borderColor: 'divider',
           },
 
           '&:hover .MuiOutlinedInput-notchedOutline': {
-            borderColor: '#5f6368',
+            borderColor: 'text.secondary',
           },
 
           '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-            borderColor: '#1a73e8',
+            borderColor: 'primary.main',
             borderWidth: 2,
           },
         },
@@ -378,7 +378,7 @@ const theme = createTheme({
     MuiInputLabel: {
       styleOverrides: {
         root: {
-          color: '#5f6368',
+          color: 'text.secondary',
         },
       },
     },
@@ -391,7 +391,7 @@ const theme = createTheme({
         },
 
         outlined: {
-          borderColor: '#dadce0',
+          borderColor: 'divider',
         },
       },
     },

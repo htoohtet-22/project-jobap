@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type SubmitEventHandler } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
@@ -9,6 +9,10 @@ import Alert from '@mui/material/Alert';
 import Link from '@mui/material/Link';
 import WorkOutlineOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined';
 import CircularProgress from '@mui/material/CircularProgress';
+import InputAdornment from '@mui/material/InputAdornment';
+import IconButton from '@mui/material/IconButton';
+import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { useAuth } from '../context/AuthContext';
 
 export default function LoginPage() {
@@ -16,10 +20,11 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit: SubmitEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
@@ -36,7 +41,7 @@ export default function LoginPage() {
   return (
     <Box
       sx={{
-        minHeight: '100svh',
+        minHeight: '100dvh',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -53,17 +58,17 @@ export default function LoginPage() {
           </Typography>
         </Box>
         {error && 
-          Array.isArray(error) ? (
-            <Alert severity="error" sx={{ mb: 2 }}>
+          (Array.isArray(error) ? (
+            <Alert severity="error" sx={{ mb: 1 }}>
               {error.map((err) => (
                 <Typography>{err.charAt(0).toUpperCase() + err.slice(1) + '.'}</Typography>
               ))}
             </Alert>
           ) : (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
+            <Alert severity="error" sx={{ mb: 1 }}>
+              {error + '.'}
             </Alert>
-          )
+          ))
         }
         <form onSubmit={handleSubmit}>
           <TextField
@@ -77,12 +82,31 @@ export default function LoginPage() {
           />
           <TextField
             label="Password"
-            type="password"
+            type={showPassword ? "text" : "password"}
             fullWidth
             required
             margin="normal"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end" sx={{ marginRight: "4px" }}>
+                    <IconButton
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      edge="end"
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showPassword ? (
+                        <VisibilityOffOutlinedIcon />
+                      ) : (
+                        <VisibilityOutlinedIcon />
+                      )}
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }
+            }}
           />
           <Button
             type="submit"
