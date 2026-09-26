@@ -13,6 +13,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import ThemeToggle from '../components/ThemeToggle';
 import { useAuth } from '../context/AuthContext';
 
 export default function RegisterPage() {
@@ -27,7 +28,6 @@ export default function RegisterPage() {
 
   const handleSubmit: SubmitEventHandler<HTMLFormElement> = async (e: any) => {
     e.preventDefault();
-    setError(null);
     setLoading(true);
     try {
       await register(email, password, username);
@@ -60,14 +60,14 @@ export default function RegisterPage() {
         </Box>
         {error && 
           (Array.isArray(error) ? (
-            <Alert severity="error" sx={{ mb: 2 }}>
+            <Alert severity="error" sx={{ px: '12px', mb: 2 }}>
               {error.map((err) => (
                 <Typography>{err.charAt(0).toUpperCase() + err.slice(1) + '.'}</Typography>
               ))}
             </Alert>
           ) : (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
+            <Alert severity="error" sx={{ px: '12px', mb: 2 }}>
+              {error + '.'}
             </Alert>
           ))
         }
@@ -136,6 +136,15 @@ export default function RegisterPage() {
           </Link>
         </Typography>
       </Paper>
+      <Box
+        sx={{ 
+          position: 'fixed', 
+          top: 24, 
+          right: 24,
+        }}
+      >
+        <ThemeToggle />
+      </Box>
     </Box>
   );
 }

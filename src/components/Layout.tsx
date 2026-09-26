@@ -8,6 +8,7 @@ import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import WorkOutlineOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined';
+import ThemeToggle from './ThemeToggle';
 import { useState, type MouseEvent } from 'react';
 import { useAuth } from '../context/AuthContext';
 
@@ -38,7 +39,8 @@ export default function Layout() {
           >
             Jobap
           </Typography>
-          <IconButton onClick={handleOpen} size="small" sx={{ p: 0 }}>
+          <ThemeToggle />
+          <IconButton onClick={handleOpen} size="small" sx={{ p: 0, ml: { xs: 2, s: 4} }}>
             <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}>
               {initial}
             </Avatar>
@@ -49,7 +51,7 @@ export default function Layout() {
           </Menu>
         </Toolbar>
       </AppBar>
-      <Box component="main" sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 2, md: 4 }, py: 4 }}>
+      <Box component="main" sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 2, sm: 4 }, py: 4 }}>
         <Outlet />
       </Box>
     </Box>

@@ -334,8 +334,9 @@ const theme = createTheme({
         root: {
           backgroundImage: 'none',
           boxShadow: '0 1px 2px rgba(60, 64, 67, 0.20)',
-          borderBottom: '1px solid',
+          borderBottom: '1px',
           borderColor: 'divider',
+          borderRadius: 0,
         },
       },
     },
@@ -513,6 +514,14 @@ const theme = createTheme({
         track: {
           borderRadius: 14,
           opacity: 1,
+        },
+      },
+    },
+
+    MuiTableCell: {
+      styleOverrides: {
+        root: {
+          borderColor: 'divider',
         },
       },
     },

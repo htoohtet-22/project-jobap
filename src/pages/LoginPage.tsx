@@ -13,6 +13,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import ThemeToggle from '../components/ThemeToggle';
 import { useAuth } from '../context/AuthContext';
 
 export default function LoginPage() {
@@ -26,7 +27,6 @@ export default function LoginPage() {
 
   const handleSubmit: SubmitEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
-    setError(null);
     setLoading(true);
     try {
       await login(username, password);
@@ -59,13 +59,13 @@ export default function LoginPage() {
         </Box>
         {error && 
           (Array.isArray(error) ? (
-            <Alert severity="error" sx={{ mb: 1 }}>
+            <Alert severity="error" sx={{ px: '12px', mb: 1 }}>
               {error.map((err) => (
                 <Typography>{err.charAt(0).toUpperCase() + err.slice(1) + '.'}</Typography>
               ))}
             </Alert>
           ) : (
-            <Alert severity="error" sx={{ mb: 1 }}>
+            <Alert severity="error" sx={{ px: '12px', mb: 1 }}>
               {error + '.'}
             </Alert>
           ))
@@ -116,7 +116,7 @@ export default function LoginPage() {
             sx={{ height: 40, mt: 3 }}
             disabled={loading}
           >
-            {loading ? <CircularProgress size="24px" /> : 'Sign in'}
+            {loading ? <CircularProgress size="24px" color="primary" /> : 'Sign in'}
           </Button>
         </form>
         <Typography variant="body2" sx={{ mt: 3, textAlign: 'center' }}>
@@ -126,6 +126,15 @@ export default function LoginPage() {
           </Link>
         </Typography>
       </Paper>
+      <Box
+        sx={{ 
+          position: 'fixed', 
+          top: 24, 
+          right: 24,
+        }}
+      >
+        <ThemeToggle />
+      </Box>
     </Box>
   );
 }
