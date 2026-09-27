@@ -93,7 +93,7 @@ export default function ApplicationsPage() {
   );
   
   return(
-    <Box>
+    <Box sx={{ mb: 10 }}>
       <Stack
         direction='row'
         spacing={2}

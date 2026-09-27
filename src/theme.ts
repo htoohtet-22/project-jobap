@@ -331,13 +331,13 @@ const theme = createTheme({
       },
 
       styleOverrides: {
-        root: {
+        root: ({ theme }) => ({
           backgroundImage: 'none',
           boxShadow: '0 1px 2px rgba(60, 64, 67, 0.20)',
           borderBottom: '1px',
-          borderColor: 'divider',
+          borderColor: theme.vars.palette.divider,
           borderRadius: 0,
-        },
+        }),
       },
     },
 
@@ -357,30 +357,30 @@ const theme = createTheme({
 
     MuiOutlinedInput: {
       styleOverrides: {
-        root: {
+        root: ({ theme }) => ({
           borderRadius: 8,
 
           '& .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'divider',
+            borderColor: theme.vars.palette.divider,
           },
 
           '&:hover .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'text.secondary',
+            borderColor: theme.vars.palette.text.secondary,
           },
 
           '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'primary.main',
+            borderColor: theme.vars.palette.primary.main,
             borderWidth: 2,
           },
-        },
+        }),
       },
     },
 
     MuiInputLabel: {
       styleOverrides: {
-        root: {
-          color: 'text.secondary',
-        },
+        root: ({ theme }) => ({
+          color: theme.vars.palette.text.secondary,
+        }),
       },
     },
 
@@ -391,9 +391,9 @@ const theme = createTheme({
           fontWeight: 500,
         },
 
-        outlined: {
-          borderColor: 'divider',
-        },
+        outlined: ({ theme }) => ({
+          borderColor: theme.vars.palette.divider,
+        }),
       },
     },
 
@@ -484,9 +484,9 @@ const theme = createTheme({
 
     MuiDivider: {
       styleOverrides: {
-        root: {
-          borderColor: 'divider',
-        },
+        root: ({ theme }) => ({
+          borderColor: theme.vars.palette.divider,
+        }),
       },
     },
 
@@ -520,9 +520,9 @@ const theme = createTheme({
 
     MuiTableCell: {
       styleOverrides: {
-        root: {
-          borderColor: 'divider',
-        },
+        root: ({ theme }) => ({ 
+          borderColor: theme.vars.palette.divider
+        })
       },
     },
   },
