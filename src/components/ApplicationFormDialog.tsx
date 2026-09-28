@@ -7,6 +7,9 @@ import Divider from '@mui/material/Divider';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Grid from '@mui/material/Grid';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -145,13 +148,21 @@ export default function ApplicationFormDialog({ open, onClose, onSubmit, initial
                 name="status"
                 control={control}
                 render={({ field }) => (
-                  <TextField {...field} select label="Status" fullWidth>
-                    {APPLICATION_STATUSES.map((s) => (
-                      <MenuItem key={s} value={s}>
-                        {STATUS_LABELS[s]}
-                      </MenuItem>
-                    ))}
-                  </TextField>
+                  <FormControl fullWidth>
+                    <InputLabel id="status-label">Status</InputLabel>
+
+                    <Select
+                      {...field}
+                      labelId="status-label"
+                      label="Status"
+                    >
+                      {APPLICATION_STATUSES.map((status) => (
+                        <MenuItem key={status} value={status}>
+                          {STATUS_LABELS[status]}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                 )}
               />
             </Grid>

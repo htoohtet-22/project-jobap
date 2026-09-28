@@ -490,34 +490,6 @@ const theme = createTheme({
       },
     },
 
-    MuiSwitch: {
-      styleOverrides: {
-        root: {
-          width: 44,
-          height: 28,
-          padding: 0,
-        },
-
-        switchBase: {
-          padding: 2,
-
-          '&.Mui-checked': {
-            transform: 'translateX(16px)',
-          },
-        },
-
-        thumb: {
-          width: 24,
-          height: 24,
-        },
-
-        track: {
-          borderRadius: 14,
-          opacity: 1,
-        },
-      },
-    },
-
     MuiTableCell: {
       styleOverrides: {
         root: ({ theme }) => ({ 

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
@@ -13,38 +13,26 @@ import DialogActions from '@mui/material/DialogActions';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
-import type { JobApplication } from '../lib/types';
-import {
-  fetchApplications,
-  createApplication,
-  deleteApplication,
-  updateApplication,
-} from '../api/applications';
+import { type JobApplication, INACTIVE_APPLICATION_STATUSES } from '../lib/types';
+import { useApplications } from '../context/ApplicationsContext';
+import ActiveApplicationsSwitch from '../components/ActiveApplicationsSwitch';
 import ApplicationsTable from '../components/ApplicationsTable';
 import ApplicationFormDialog, { type ApplicationFormValues } from '../components/ApplicationFormDialog';
 
 export default function ApplicationsPage() {
-  const [applications, setApplications] = useState<JobApplication[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { 
+    applications, 
+    loading, 
+    addApplication, 
+    editApplication, 
+    removeApplication
+  } = useApplications();
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<JobApplication | null>(null);
   const [toDelete, setToDelete] = useState<JobApplication | null>(null);
+  const [showActiveOnly, setShowActiveOnly] = useState(true);
   const theme = useTheme();
   const isMobileView = useMediaQuery(theme.breakpoints.down('sm'));
-
-  const load = async () => {
-    setLoading(true);
-    try {
-      const apps = await fetchApplications();
-      setApplications(apps);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    load();
-  }, []);
 
   const openCreate = () => {
     setEditing(null);
@@ -55,7 +43,7 @@ export default function ApplicationsPage() {
     setEditing(app);
     setFormOpen(true);
   };
-
+  
   const handleSubmit = async (values: ApplicationFormValues) => {
     const payload = {
       ...values,
@@ -68,32 +56,36 @@ export default function ApplicationsPage() {
       contactEmail: values.contactEmail || undefined,
       contactNumber: values.contactNumber || undefined,
     };
+
     if (editing) {
-      await updateApplication(editing.id, payload as any);
+      await editApplication(editing.id, payload as any);
     } else {
-      await createApplication(payload as any);
-    }
+      await addApplication(payload as any);
+    } 
     setFormOpen(false);
-    await load();
   };
 
   const confirmDelete = async () => {
     if (!toDelete) return;
-    await deleteApplication(toDelete.id);
+    await removeApplication(toDelete.id);
     setToDelete(null);
-    await load();
   };
+  
+  const rows = useMemo(() => {
+    const filteredApplications = showActiveOnly
+      ? applications.filter(
+          (application) =>
+            !INACTIVE_APPLICATION_STATUSES.includes(application.status),
+        )
+      : applications;
 
-  const rows = useMemo(
-    () => 
-      [...applications].sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      ),
-    [applications],
-  );
+    return [...filteredApplications].sort((a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+  }, [applications, showActiveOnly]);
   
   return(
-    <Box sx={{ mb: 10 }}>
+    <Box sx={{ mb: isMobileView ? 10 : 2 }}>
       <Stack
         direction='row'
         spacing={2}
@@ -103,12 +95,27 @@ export default function ApplicationsPage() {
           alignItems: { xs: 'flex-start', sm: 'center' }
         }}
       >
-        <Typography variant="h4">Applications ({applications.length})</Typography>
-        {!isMobileView && (
-          <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate}>
-            Add Application
-          </Button>
-        )}
+        <Typography variant="h4">
+          Applications {`(${rows.length})`}
+        </Typography>
+        <Stack 
+          direction='row' 
+          spacing={2}
+          sx={{
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <ActiveApplicationsSwitch 
+            checked={showActiveOnly}
+            onChange={setShowActiveOnly}
+          />
+          {!isMobileView && (
+            <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate}>
+              Add Application
+            </Button>
+          )}
+        </Stack>
       </Stack>
 
       {loading ? (

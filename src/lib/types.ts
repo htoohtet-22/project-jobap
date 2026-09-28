@@ -23,6 +23,13 @@ export const APPLICATION_STATUSES: ApplicationStatus[] = [
   'UNRESPONSIVE',
 ];
 
+export const INACTIVE_APPLICATION_STATUSES: ApplicationStatus[] = [
+  'REJECTED', 
+  'WITHDRAWN', 
+  'EXPIRED', 
+  'UNRESPONSIVE'
+];
+
 export const STATUS_LABELS: Record<ApplicationStatus, string> = {
   APPLIED: 'Applied',
   VIEWED: 'Viewed',

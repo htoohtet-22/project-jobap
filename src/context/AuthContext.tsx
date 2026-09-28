@@ -11,7 +11,7 @@ import { type User } from '../lib/types';
 interface AuthContextValue {
   user: User | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (username: string, password: string) => Promise<void>;
   register: (email: string, password: string, username: string) => Promise<void>;
   logout: () => void;
 }
