@@ -10,11 +10,12 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import WorkOutlineOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined';
 import { useAuth } from '../context/AuthContext';
-import ApplicationsProvider from '../context/ApplicationsContext';
+import { useSnackbarAlert } from '../context/SnackbarAlertContext';
 import ThemeToggle from './ThemeToggle';
 
 export default function Layout() {
   const { user, logout } = useAuth();
+  const { showSnackbarAlert } = useSnackbarAlert();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -25,38 +26,62 @@ export default function Layout() {
     handleClose();
     logout();
     navigate('/login');
+    showSnackbarAlert('Successful logging out.', 'success')
   };
 
   const initial = (user?.username || user?.email || '?').charAt(0).toUpperCase();
 
   return (
-    <ApplicationsProvider>
-      <Box sx={{ minHeight: '100dvh', bgcolor: 'background.default' }}>
-        <AppBar position="sticky" color="inherit" sx={{ bgcolor: 'background.paper' }}>
-          <Toolbar>
-            <WorkOutlineOutlinedIcon sx={{ color: 'primary.main', mr: 1 }} />
-            <Typography
-              variant="h6"
-              sx={{ flexGrow: 1, color: 'text.primary', fontWeight: 500 }}
-            >
-              Jobap
-            </Typography>
-            <ThemeToggle />
-            <IconButton onClick={handleOpen} size="small" sx={{ p: 0, ml: { xs: 2, s: 4} }}>
-              <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}>
-                {initial}
-              </Avatar>
-            </IconButton>
-            <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={handleClose}>
-              <MenuItem disabled>{user?.email}</MenuItem>
-              <MenuItem onClick={handleLogout} sx={{ color: 'error.main' }}>Log out</MenuItem>
-            </Menu>
-          </Toolbar>
-        </AppBar>
-        <Box component="main" sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 2, sm: 4 }, py: 4 }}>
-          <Outlet />
-        </Box>
+    <Box 
+      sx={{ 
+        height: '100dvh', 
+        bgcolor: 'background.default',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+      }}
+    >
+      <AppBar position="static" color="inherit" sx={{ bgcolor: 'background.paper', flexShrink: 0 }}>
+        <Toolbar>
+          <WorkOutlineOutlinedIcon sx={{ color: 'primary.main', mr: 1 }} />
+          <Typography
+            variant="h6"
+            sx={{ flexGrow: 1, color: 'text.primary', fontWeight: 500 }}
+          >
+            Jobap
+          </Typography>
+          <ThemeToggle />
+          <IconButton onClick={handleOpen} size="small" sx={{ p: 0, ml: { xs: 2, s: 4} }}>
+            <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}>
+              {initial}
+            </Avatar>
+          </IconButton>
+          <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={handleClose}>
+            <MenuItem disabled>{user?.email}</MenuItem>
+            <MenuItem onClick={handleLogout} sx={{ color: 'error.main' }}>Log out</MenuItem>
+          </Menu>
+        </Toolbar>
+      </AppBar>
+      <Box
+        component="main"
+        sx={{
+          flex: 1,
+          height: '100%',
+          width: '100%',
+          minHeight: 0,
+          maxWidth: 1200,
+          mx: 'auto',
+          overflow: 'auto',
+          px: { xs: 2, sm: 4 },
+          py: { xs: 3, sm: 4 },
+          scrollbarWidth: 'none',
+          '&::-webkit-scrollbar': {
+            display: 'none',
+          },
+        }}
+      >
+        <Outlet />
       </Box>
-    </ApplicationsProvider>
+    </Box>
   );
 }

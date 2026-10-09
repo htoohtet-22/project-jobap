@@ -5,7 +5,6 @@ import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import Alert from '@mui/material/Alert';
 import Link from '@mui/material/Link';
 import WorkOutlineOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -15,15 +14,16 @@ import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import ThemeToggle from '../components/ThemeToggle';
 import { useAuth } from '../context/AuthContext';
+import { useSnackbarAlert } from '../context/SnackbarAlertContext';
 
 export default function RegisterPage() {
-  const { register } = useAuth();
   const navigate = useNavigate();
+  const { register } = useAuth();
+  const { showSnackbarAlert } = useSnackbarAlert();
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit: SubmitEventHandler<HTMLFormElement> = async (e: any) => {
@@ -32,8 +32,24 @@ export default function RegisterPage() {
     try {
       await register(email, password, username);
       navigate('/');
+      showSnackbarAlert('Successful creating account.', 'success');
     } catch (err: any) {
-      setError(err?.response?.data?.message || 'Could not create account');
+      const rawError = err?.response?.data?.message
+        ?? 'Failed to create account. Please Try again Later. ';
+
+      const errorMessage = Array.isArray(rawError)
+      ? rawError
+          .map((message: string) =>
+            message.charAt(0).toUpperCase() +
+            message.slice(1).replace(/[.!?]+$/, '') +
+            '.',
+          )
+          .join('\n')
+      : rawError.charAt(0).toUpperCase() +
+        rawError.slice(1).replace(/[.!?]+$/, '') +
+        '.';
+
+      showSnackbarAlert(errorMessage, 'error');
     } finally {
       setLoading(false);
     }
@@ -58,19 +74,6 @@ export default function RegisterPage() {
             Start tracking your job search today
           </Typography>
         </Box>
-        {error && 
-          (Array.isArray(error) ? (
-            <Alert severity="error" sx={{ px: '12px', mb: 2 }}>
-              {error.map((err) => (
-                <Typography>{err.charAt(0).toUpperCase() + err.slice(1) + '.'}</Typography>
-              ))}
-            </Alert>
-          ) : (
-            <Alert severity="error" sx={{ px: '12px', mb: 2 }}>
-              {error + '.'}
-            </Alert>
-          ))
-        }
         <form onSubmit={handleSubmit}>
           <TextField
             label="Username"

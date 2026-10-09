@@ -5,7 +5,6 @@ import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import Alert from '@mui/material/Alert';
 import Link from '@mui/material/Link';
 import WorkOutlineOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -15,14 +14,15 @@ import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import ThemeToggle from '../components/ThemeToggle';
 import { useAuth } from '../context/AuthContext';
+import { useSnackbarAlert } from '../context/SnackbarAlertContext';
 
 export default function LoginPage() {
-  const { login } = useAuth();
   const navigate = useNavigate();
+  const { login } = useAuth();
+  const { showSnackbarAlert } = useSnackbarAlert();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit: SubmitEventHandler<HTMLFormElement> = async (e) => {
@@ -32,7 +32,22 @@ export default function LoginPage() {
       await login(username, password);
       navigate('/');
     } catch (err: any) {
-      setError(err?.response?.data?.message || 'Invalid username or password');
+      const rawError = err?.response?.data?.message
+        ?? 'Failed to sign in. Please try again later.';
+
+      const errorMessage = Array.isArray(rawError)
+      ? rawError
+          .map((message: string) =>
+            message.charAt(0).toUpperCase() +
+            message.slice(1).replace(/[.!?]+$/, '') +
+            '.',
+          )
+          .join('\n')
+      : rawError.charAt(0).toUpperCase() +
+        rawError.slice(1).replace(/[.!?]+$/, '') +
+        '.';
+
+      showSnackbarAlert(errorMessage, 'error');
     } finally {
       setLoading(false);
     }
@@ -57,19 +72,6 @@ export default function LoginPage() {
             Track every job application in one place
           </Typography>
         </Box>
-        {error && 
-          (Array.isArray(error) ? (
-            <Alert severity="error" sx={{ px: '12px', mb: 1 }}>
-              {error.map((err) => (
-                <Typography>{err.charAt(0).toUpperCase() + err.slice(1) + '.'}</Typography>
-              ))}
-            </Alert>
-          ) : (
-            <Alert severity="error" sx={{ px: '12px', mb: 1 }}>
-              {error + '.'}
-            </Alert>
-          ))
-        }
         <form onSubmit={handleSubmit}>
           <TextField
             label="Username"
@@ -78,6 +80,7 @@ export default function LoginPage() {
             required
             margin="normal"
             value={username}
+            helperText="Username is case sensitive."
             onChange={(e) => setUsername(e.target.value)}
           />
           <TextField

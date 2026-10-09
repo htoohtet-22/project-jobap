@@ -6,6 +6,13 @@ export const fetchApplications = async (): Promise<JobApplication[]> => {
   return data;
 };
 
+export const getApplication = async (
+  id: string
+): Promise<JobApplication> => {
+  const { data } = await client.get<JobApplication>(`/applications/${id}`);
+  return data;
+};
+
 export const createApplication = async (
   input: Partial<JobApplicationInput>,
 ): Promise<JobApplication> => {
@@ -17,7 +24,7 @@ export const updateApplication = async (
   id: string,
   input: Partial<JobApplicationInput>,
 ): Promise<JobApplication> => {
-  const { data } = await client.patch<JobApplication>(`/applications/${id}`, input);
+  const { data } = await client.put<JobApplication>(`/applications/${id}`, input);
   return data;
 };
 

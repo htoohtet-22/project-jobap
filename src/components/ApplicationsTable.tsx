@@ -1,37 +1,39 @@
+import { useNavigate } from "react-router-dom";
 import Paper from "@mui/material/Paper";
-import Table from "@mui/material/Table";
 import TableContainer from "@mui/material/TableContainer";
+import Table from "@mui/material/Table";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
 import TableBody from "@mui/material/TableBody";
 import Link from "@mui/material/Link";
-import Stack from "@mui/material/Stack";
-import IconButton from "@mui/material/IconButton";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
 import StatusChip from "./StatusChip";
 import type { JobApplication } from "../lib/types";
 
-interface Props {
-  rows: JobApplication[],
-  openEdit: (app: JobApplication) => void,
-  setToDelete: (app: JobApplication) => void,
-}
+export default function ApplicationsTable({ rows }: { rows: JobApplication[] }) {
+  const navigate = useNavigate();
 
-export default function ApplicationsTable({ rows, openEdit, setToDelete }: Props) {
   return (
-    <Paper variant="outlined" sx={{ 
-      width: '100%',
-      height: '100%',
-      overflow: 'hidden',
-    }}>
-      <TableContainer sx={{
+    <Paper 
+      variant="outlined" 
+      sx={{ 
         width: '100%',
-        overflowX: 'auto', 
-      }}>
-        <Table >
+        overflow: 'hidden',
+      }}
+    >
+      <TableContainer 
+        sx={{ 
+          width: '100%',
+          height: '100%',
+          overscrollBehavior: 'none',
+          scrollbarWidth: 0,
+          '&::-webkit-scrollbar': {
+            display: 'none',
+          },
+        }}
+      >
+        <Table stickyHeader>
           <TableHead>
             <TableRow>
               <TableCell>Title</TableCell>
@@ -39,12 +41,19 @@ export default function ApplicationsTable({ rows, openEdit, setToDelete }: Props
               <TableCell>Status</TableCell>
               <TableCell>Date Applied</TableCell>
               <TableCell>Follow-up</TableCell>
-              <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {rows.map((app) => (
-              <TableRow key={app.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+              <TableRow 
+                key={app.id} 
+                hover
+                sx={{ 
+                  cursor: 'pointer',
+                  '&:last-child td, &:last-child th': { border: 0 },
+                }}
+                onClick={() => navigate(`/applications/${app.id}`)}
+              >
                 <TableCell sx={{ fontWeight: 500 }}>
                   {app.jobLink ? (
                     <Link
@@ -70,16 +79,6 @@ export default function ApplicationsTable({ rows, openEdit, setToDelete }: Props
                 </TableCell>
                 <TableCell>
                   {app.followUpDate ? new Date(app.followUpDate).toLocaleDateString() : '—'}
-                </TableCell>
-                <TableCell>
-                  <Stack direction="row" spacing={2}>
-                    <IconButton onClick={() => openEdit(app)}>
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton onClick={() => setToDelete(app)} sx={{ color: 'error.main' }}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </Stack>
                 </TableCell>
               </TableRow>
             ))}

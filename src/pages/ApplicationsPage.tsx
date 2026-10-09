@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
@@ -6,43 +6,43 @@ import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import CircularProgress from '@mui/material/CircularProgress';
 import AddIcon from '@mui/icons-material/Add';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
-import { type JobApplication, INACTIVE_APPLICATION_STATUSES } from '../lib/types';
-import { useApplications } from '../context/ApplicationsContext';
+import { type JobApplication, type JobApplicationInput, INACTIVE_APPLICATION_STATUSES } from '../lib/types';
+import { fetchApplications, createApplication } from '../api/applications';
+import { useSnackbarAlert } from '../context/SnackbarAlertContext';
 import ActiveApplicationsSwitch from '../components/ActiveApplicationsSwitch';
 import ApplicationsTable from '../components/ApplicationsTable';
 import ApplicationFormDialog, { type ApplicationFormValues } from '../components/ApplicationFormDialog';
 
 export default function ApplicationsPage() {
-  const { 
-    applications, 
-    loading, 
-    addApplication, 
-    editApplication, 
-    removeApplication
-  } = useApplications();
+  const [applications, setApplications] = useState<JobApplication[]>([]);
+  const [loading, setLoading] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
-  const [editing, setEditing] = useState<JobApplication | null>(null);
-  const [toDelete, setToDelete] = useState<JobApplication | null>(null);
   const [showActiveOnly, setShowActiveOnly] = useState(true);
-  const theme = useTheme();
-  const isMobileView = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobileView = useMediaQuery(useTheme().breakpoints.down('sm'));
+  const { showSnackbarAlert } = useSnackbarAlert();
 
-  const openCreate = () => {
-    setEditing(null);
-    setFormOpen(true);
+  const loadApplications = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await fetchApplications();
+      setApplications(data);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const addApplication = async (input: Partial<JobApplicationInput>) => {
+    const application = await createApplication(input);
+    setApplications((prev) => [application, ...prev]);
+    return application;
   };
 
-  const openEdit = (app: JobApplication) => {
-    setEditing(app);
-    setFormOpen(true);
-  };
+  useEffect(() => {
+    loadApplications();
+  }, [loadApplications]);
   
   const handleSubmit = async (values: ApplicationFormValues) => {
     const payload = {
@@ -57,18 +57,13 @@ export default function ApplicationsPage() {
       contactNumber: values.contactNumber || undefined,
     };
 
-    if (editing) {
-      await editApplication(editing.id, payload as any);
-    } else {
+    try{
       await addApplication(payload as any);
-    } 
-    setFormOpen(false);
-  };
-
-  const confirmDelete = async () => {
-    if (!toDelete) return;
-    await removeApplication(toDelete.id);
-    setToDelete(null);
+      setFormOpen(false);
+      showSnackbarAlert('Successful adding application.', 'success');
+    } catch {
+      showSnackbarAlert('Failed to add application. Please try again later.', 'error');
+    }
   };
   
   const rows = useMemo(() => {
@@ -83,16 +78,31 @@ export default function ApplicationsPage() {
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     );
   }, [applications, showActiveOnly]);
+
+  if (loading) {
+    return (
+      <Box sx={{ height: '100%', display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
   
   return(
-    <Box sx={{ mb: isMobileView ? 10 : 2 }}>
+    <Box sx={{ 
+      height: '100%',
+      minHeight: 0,
+      display: 'flex',
+      flex: 1,
+      flexDirection: 'column',
+    }}>
       <Stack
         direction='row'
         spacing={2}
         sx={{ 
           mb: 3,
-          justifyContent: "space-between",
-          alignItems: { xs: 'flex-start', sm: 'center' }
+          flexShrink: 0,
+          justifyContent: 'space-between',
+          alignItems: 'center'
         }}
       >
         <Typography variant="h4">
@@ -100,7 +110,7 @@ export default function ApplicationsPage() {
         </Typography>
         <Stack 
           direction='row' 
-          spacing={2}
+          spacing={isMobileView ? 1 : 2}
           sx={{
             justifyContent: 'center',
             alignItems: 'center',
@@ -111,63 +121,56 @@ export default function ApplicationsPage() {
             onChange={setShowActiveOnly}
           />
           {!isMobileView && (
-            <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate}>
+            <Button 
+              variant="contained" 
+              startIcon={<AddIcon />} 
+              onClick={() => setFormOpen(true)}
+            >
               Add Application
             </Button>
           )}
         </Stack>
       </Stack>
 
-      {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', p: 6 }}>
-          <CircularProgress />
-        </Box>
-      ) : applications.length === 0 ? (
-        <Paper variant="outlined" >
-          <Box sx={{ p: 6, textAlign: 'center' }}>
-            <Typography color="text.secondary">
-              No applications yet. Add your first one to get started.
-            </Typography>
-          </Box>
-        </Paper>
-      ) : (
-        <ApplicationsTable rows={rows} openEdit={openEdit} setToDelete={setToDelete} />
-      )}
+      <Box
+        sx={{
+          display: 'flex',
+          minHeight: 0,
+          overflowY: 'hidden',
+        }}
+      >
+        {applications.length === 0 ? (
+          <Paper variant="outlined" sx={{ height: 'max-content', width: '100%' }}>
+            <Box sx={{ p: 6, textAlign: 'center' }}>
+              <Typography color="text.secondary">
+                No applications yet. Add your first one to get started.
+              </Typography>
+            </Box>
+          </Paper>
+        ) : (
+          <ApplicationsTable rows={rows} />
+        )}
+      </Box>
 
       {isMobileView && (
-        <Button 
-          onClick={openCreate} 
-          size="small" 
-          color="primary" 
-          variant="contained" 
-          sx={{ position: 'fixed', bottom: 32, right: 24, p: 0 }}>
-          <AddIcon sx={{ width: 48, height: 48, p: '12px' }} />
-        </Button>
-      )}
+        <Box sx={{ width: '100%', mt: 3 }}>
+          <Button
+            onClick={() => setFormOpen(true)} 
+            size="small" 
+            color="primary" 
+            variant="contained" 
+            startIcon={<AddIcon />}
+            sx={{ width: '100%', height: '48px', p: 0 }}>
+            Add Application
+          </Button>
+        </Box>
+    )}
 
       <ApplicationFormDialog
         open={formOpen}
         onClose={() => setFormOpen(false)}
         onSubmit={handleSubmit}
-        initial={editing}
       />
-
-      <Dialog open={!!toDelete} onClose={() => setToDelete(null)}>
-        <DialogTitle>Delete application?</DialogTitle>
-        <DialogContent>
-          <Typography>
-            This will permanently remove {toDelete?.company} — {toDelete?.title}.
-          </Typography>
-        </DialogContent>
-        <DialogActions sx={{ p: 2 }}>
-          <Button onClick={() => setToDelete(null)} color="inherit">
-            Cancel
-          </Button>
-          <Button onClick={confirmDelete} color="error" variant="contained">
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Box>
   );
 }

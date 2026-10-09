@@ -14,6 +14,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Grid from '@mui/material/Grid';
 import CircularProgress from '@mui/material/CircularProgress';
 import { APPLICATION_STATUSES, type JobApplication, STATUS_LABELS } from '../lib/types';
+import InputAdornment from '@mui/material/InputAdornment';
 
 export interface ApplicationFormValues {
   company: string;
@@ -91,23 +92,7 @@ export default function ApplicationFormDialog({ open, onClose, onSubmit, initial
         <DialogContent dividers sx={{ overflowY: 'auto', py: 3 }}>
           <Divider textAlign="center" sx={{ mb: 2, color: "text.secondary" }}>Job Details</Divider>
           <Grid container spacing={2}>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <Controller
-                name="company"
-                control={control}
-                rules={{ required: 'Company is required' }}
-                render={({ field, fieldState }) => (
-                  <TextField
-                    {...field}
-                    label="Company"
-                    fullWidth
-                    error={!!fieldState.error}
-                    helperText={fieldState.error?.message}
-                  />
-                )}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={12}>
               <Controller
                 name="title"
                 control={control}
@@ -123,14 +108,39 @@ export default function ApplicationFormDialog({ open, onClose, onSubmit, initial
                 )}
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={12}>
+              <Controller
+                name="company"
+                control={control}
+                rules={{ required: 'Company is required' }}
+                render={({ field, fieldState }) => (
+                  <TextField
+                    {...field}
+                    label="Company"
+                    fullWidth
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
+                  />
+                )}
+              />
+            </Grid>
+            <Grid size={12}>
               <Controller
                 name="salary"
                 control={control}
-                render={({ field }) => <TextField {...field} label="Salary" fullWidth />}
+                render={({ field }) => <TextField 
+                  {...field} 
+                  label="Salary" 
+                  fullWidth
+                  slotProps={{
+                    input: { 
+                      endAdornment: <InputAdornment position="end">per month</InputAdornment>
+                    }
+                  }}
+                />}
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={12}>
               <Controller
                 name="jobLink"
                 control={control}
@@ -143,7 +153,7 @@ export default function ApplicationFormDialog({ open, onClose, onSubmit, initial
 
           <Divider textAlign="center" sx={{ mt: 4, mb: 2, color: "text.secondary" }}>Application Details</Divider>
           <Grid container spacing={2}>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={12}>
               <Controller
                 name="status"
                 control={control}
@@ -214,16 +224,7 @@ export default function ApplicationFormDialog({ open, onClose, onSubmit, initial
                 name="contactPerson"
                 control={control}
                 render={({ field }) => (
-                  <TextField {...field} label="Contact Person" fullWidth />
-                )}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <Controller
-                name="contactEmail"
-                control={control}
-                render={({ field }) => (
-                  <TextField {...field} label="Contact Email" fullWidth />
+                  <TextField {...field} label="Contact Name" fullWidth />
                 )}
               />
             </Grid>
@@ -233,6 +234,15 @@ export default function ApplicationFormDialog({ open, onClose, onSubmit, initial
                 control={control}
                 render={({ field }) => (
                   <TextField {...field} label="Contact Number" fullWidth />
+                )}
+              />
+            </Grid>
+            <Grid size={12}>
+              <Controller
+                name="contactEmail"
+                control={control}
+                render={({ field }) => (
+                  <TextField {...field} label="Contact Email" fullWidth />
                 )}
               />
             </Grid>
