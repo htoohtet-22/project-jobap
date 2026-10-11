@@ -24,7 +24,7 @@ export const updateApplication = async (
   id: string,
   input: Partial<JobApplicationInput>,
 ): Promise<JobApplication> => {
-  const { data } = await client.put<JobApplication>(`/applications/${id}`, input);
+  const { data } = await client.patch<JobApplication>(`/applications/${id}`, input);
   return data;
 };
 
