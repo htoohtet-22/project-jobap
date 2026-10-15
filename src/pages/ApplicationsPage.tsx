@@ -6,29 +6,36 @@ import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import CircularProgress from '@mui/material/CircularProgress';
 import AddIcon from '@mui/icons-material/Add';
+import Alert from '@mui/material/Alert';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
 import { type JobApplication, type JobApplicationInput, INACTIVE_APPLICATION_STATUSES } from '../lib/types';
 import { fetchApplications, createApplication } from '../api/applications';
 import { useSnackbarAlert } from '../context/SnackbarAlertContext';
+import { useApplicationsViewToggle } from '../context/ApplicationsViewToggleContext';
 import ActiveApplicationsSwitch from '../components/ActiveApplicationsSwitch';
+import ApplicationCardsStack from '../components/ApplicationCardsStack';
 import ApplicationsTable from '../components/ApplicationsTable';
 import ApplicationFormDialog, { type ApplicationFormValues } from '../components/ApplicationFormDialog';
+import ApplicationsToggleButtonGroup from '../components/ApplicationsViewToggleButtonGroup';
 
 export default function ApplicationsPage() {
   const [applications, setApplications] = useState<JobApplication[]>([]);
   const [loading, setLoading] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
-  const [showActiveOnly, setShowActiveOnly] = useState(true);
+  const [showActiveOnly, setShowActiveOnly] = useState(false);
   const isMobileView = useMediaQuery(useTheme().breakpoints.down('sm'));
   const { showSnackbarAlert } = useSnackbarAlert();
+  const { currentView } = useApplicationsViewToggle();
 
   const loadApplications = useCallback(async () => {
     setLoading(true);
     try {
       const data = await fetchApplications();
       setApplications(data);
+    } catch {
+      showSnackbarAlert('Failed to load applications. Please try again later.', 'error');
     } finally {
       setLoading(false);
     }
@@ -66,15 +73,15 @@ export default function ApplicationsPage() {
     }
   };
   
-  const rows = useMemo(() => {
-    const filteredApplications = showActiveOnly
+  const filteredApplications = useMemo(() => {
+    const updatedApplications = showActiveOnly
       ? applications.filter(
           (application) =>
             !INACTIVE_APPLICATION_STATUSES.includes(application.status),
         )
       : applications;
 
-    return [...filteredApplications].sort((a, b) =>
+    return [...updatedApplications].sort((a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     );
   }, [applications, showActiveOnly]);
@@ -97,16 +104,16 @@ export default function ApplicationsPage() {
     }}>
       <Stack
         direction='row'
-        spacing={2}
+        spacing={{ xs: 2, sm: 3 }}
         sx={{ 
-          mb: 3,
+          mb: { xs: 2, sm: 3 },
           flexShrink: 0,
           justifyContent: 'space-between',
           alignItems: 'center'
         }}
       >
         <Typography variant="h4">
-          Applications {`(${rows.length})`}
+          Applications {`(${filteredApplications.length})`}
         </Typography>
         <Stack 
           direction='row' 
@@ -116,10 +123,11 @@ export default function ApplicationsPage() {
             alignItems: 'center',
           }}
         >
-          <ActiveApplicationsSwitch 
+          {/* <ActiveApplicationsSwitch 
             checked={showActiveOnly}
             onChange={setShowActiveOnly}
-          />
+          /> */}
+          <ApplicationsToggleButtonGroup />
           {!isMobileView && (
             <Button 
               variant="contained" 
@@ -147,13 +155,19 @@ export default function ApplicationsPage() {
               </Typography>
             </Box>
           </Paper>
+        ) : currentView === 'table' ? (
+          <ApplicationsTable rows={filteredApplications} />
+        ) : currentView === 'cards' ? (
+          <ApplicationCardsStack applications={filteredApplications} />
         ) : (
-          <ApplicationsTable rows={rows} />
+          <Alert severity="error">
+            Something went wrong. Please try again later.
+          </Alert>
         )}
       </Box>
 
       {isMobileView && (
-        <Box sx={{ width: '100%', mt: 3 }}>
+        <Box sx={{ width: '100%', mt: 2 }}>
           <Button
             onClick={() => setFormOpen(true)} 
             size="small" 

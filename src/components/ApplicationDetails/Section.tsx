@@ -14,7 +14,7 @@ export default function Section({
   return (
     <Paper
       variant="outlined"
-      sx={{ p: 3 }}
+      sx={{ p: { xs: 2, sm: 3 } }}
     >
       <Box sx={{ mb: 3 }}>
         <Typography variant="h5">

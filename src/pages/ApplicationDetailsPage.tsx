@@ -40,26 +40,7 @@ import StatusChip from '../components/StatusChip';
 import Section from '../components/ApplicationDetails/Section';
 import DetailItem from '../components/ApplicationDetails/DetailItem';
 import ApplicationFormDialog, { type ApplicationFormValues } from '../components/ApplicationFormDialog';
-
-function formatDate(value?: string | null) {
-  if (!value) return 'Not specified';
-
-  return new Intl.DateTimeFormat('en-SG', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  }).format(new Date(value));
-}
-
-function formatDateTime(value: string) {
-  return new Intl.DateTimeFormat('en-SG', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-  }).format(new Date(value));
-}
+import { formatDate, formatDateTime } from '../lib/utlis';
 
 export default function ApplicationDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -153,11 +134,8 @@ export default function ApplicationDetailsPage() {
         <Button
           startIcon={<ArrowBackIcon />}
           onClick={() => navigate('/')}
-          sx={{
-            alignSelf: 'flex-start',
-          }}
         >
-          Applications
+          Back to Applications
         </Button>
 
         <Alert severity="error">
@@ -171,21 +149,22 @@ export default function ApplicationDetailsPage() {
     <Box>
       {/* Back navigation */}
       <Button
+        color="secondary"
         startIcon={<ArrowBackIcon />}
         onClick={() => navigate('/')}
         sx={{
-          mb: 3,
+          mb: { xs: 2, sm: 3 },
           color: 'text.secondary',
         }}
       >
-        Applications
+        Back to Applications
       </Button>
 
       {/* Header */}
       <Box
         sx={{
           px: 2.5,
-          mb: 4.5,
+          mb: { xs: 4, sm: 4.5 },
         }}
       >
         <Stack

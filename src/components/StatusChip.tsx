@@ -24,7 +24,12 @@ export default function StatusChip({ status }: { status: ApplicationStatus }) {
     <Chip 
       label={STATUS_LABELS[status]}
       size="small"
-      sx={{ backgroundColor: c.bg, color: c.fg }}
+      sx={{ 
+        backgroundColor: c.bg, 
+        color: c.fg,
+        cursor: 'default',
+        width: 'fit-content',
+      }}
     />
   )
 }

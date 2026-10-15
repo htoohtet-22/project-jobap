@@ -78,6 +78,6 @@ export function SnackbarAlertProvider({
 
 export function useSnackbarAlert() {
   const context = useContext(SnackbarAlertContext);
-  if (!context) throw new Error('useSnackbar must be used within a SnackbarProvider');
+  if (!context) throw new Error('useSnackbar must be used within a SnackbarAlertProvider');
   return context;
 }

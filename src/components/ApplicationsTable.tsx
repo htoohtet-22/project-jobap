@@ -10,6 +10,7 @@ import Link from "@mui/material/Link";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import StatusChip from "./StatusChip";
 import type { JobApplication } from "../lib/types";
+import { formatDate } from "../lib/utlis";
 
 export default function ApplicationsTable({ rows }: { rows: JobApplication[] }) {
   const navigate = useNavigate();
@@ -75,10 +76,10 @@ export default function ApplicationsTable({ rows }: { rows: JobApplication[] }) 
                   <StatusChip status={app.status} />
                 </TableCell>
                 <TableCell>
-                  {app.dateApplied ? new Date(app.dateApplied).toLocaleDateString() : '—'}
+                  {app.dateApplied ? formatDate(app.dateApplied) : '-'}
                 </TableCell>
                 <TableCell>
-                  {app.followUpDate ? new Date(app.followUpDate).toLocaleDateString() : '—'}
+                  {app.followUpDate ? formatDate(app.followUpDate) : '-'}
                 </TableCell>
               </TableRow>
             ))}
